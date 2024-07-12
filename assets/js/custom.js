@@ -91,22 +91,43 @@ function updateScoreText(playerHand, dealerHand) {
     DealerScoreText.innerHTML = `Puntaje acumulado: ${dealerHand.getScore()}`;
 }
 
-function getResultGame() {
+function getGameResultText(text) {
+    WinLoseTitle.innerHTML = text;
+    btnAddCard.style.display = "none";
+    btnStopAddCard.style.display = "none";
+}
 
-    const playerScore = playerHand.getScore();
-    const dealerScore = dealerHand.getScore();
+function getResultGame(playerScore, dealerScore) {
 
-    if (playerScore == 21) {
+    let isPlayerBlackJack = playerScore == 21;
+    let isDealerBlackJack = dealerScore == 21;
+    let isPlayerExceed21 = playerScore > 21;
+    let isDealerExceed21 = dealerScore > 21;
 
-        WinLoseTitle.innerHTML = "Ganaste";
-        btnAddCard.style.display = "none";
-        btnStopAddCard.style.display = "none";
+    if (isPlayerBlackJack) {
+        getGameResultText("Ganaste");
+    } else if (isPlayerExceed21) {
+        getGameResultText("Perdiste");
+    } else {
+        // PlayerScore < 21
+        let isDealerPlaying = dealerScore !== undefined;
 
-    } else if (playerScore > 21) {
+        if (!isDealerPlaying) {
+            return;
+        }
 
-        WinLoseTitle.innerHTML = "Perdiste";
-        btnAddCard.style.display = "none";
-        btnStopAddCard.style.display = "none";
+        if (isDealerBlackJack) {
+            getGameResultText("Dealer Gana");
+        } else if (isDealerExceed21) {
+            getGameResultText("Ganaste");
+        } else {
+            // DealderScore < 21
+            if (playerScore > dealerScore) {
+                getGameResultText("Ganaste");
+            } else {
+                getGameResultText("Dealer Gana");
+            }
+        }
     }
 }
 
@@ -142,7 +163,7 @@ btnAddCard.addEventListener("click", function () {
     }
 
     updateScoreText(playerHand, dealerHand);
-    getResultGame();
+    getResultGame(playerHand.getScore());
 });
 
 function cardTemplate(userHand, userDeckContainer) {
@@ -164,22 +185,11 @@ function cardTemplate(userHand, userDeckContainer) {
 
 btnStopAddCard.addEventListener("click", function () {
     while (dealerHand.getScore() < playerHand.getScore()) {
-
         cardTemplate(dealerHand, DealerDeckContainer)
-        console.log(`Dealer pide una carta: ${dealerHand.cards[dealerHand.cards.length - 1].faceValue}`);
-        console.log(dealerHand.cards);
-        console.log(`Dealer score ${dealerHand.getScore()}`);
-
         updateScoreText(playerHand, dealerHand);
     }
 
-    // if (dealerHand.getScore() > playerHand.getScore() && dealerHand.getScore() <= 21) {
-    //     console.log("El dealer gana");
-    // } else {
-    //     console.log("Gana el jugador");
-    // }
-
-    getResultGame();
+    getResultGame(playerHand.getScore(), dealerHand.getScore())
 });
 
 btnResetGame.addEventListener("click", resetGame);
