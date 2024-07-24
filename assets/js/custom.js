@@ -158,7 +158,7 @@ function deleteCards() {
 btnAddCard.addEventListener("click", function () {
     cardTemplate(playerHand, PlayerDeckContainer);
 
-    if (playerHand.cards.length >= 2) {
+    if (dealerHand.cards.length == 0) {
         cardTemplate(dealerHand, DealerDeckContainer);
     }
 
